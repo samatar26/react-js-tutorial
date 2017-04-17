@@ -1,3 +1,4 @@
+### Some essential ES6 features
 ### Class
 This is a class declaration
 In order to add properties we need to use the constructor method.
@@ -53,6 +54,46 @@ class Warrior extends Human {
   }
 }
 ```
+
+### static keyword
+When you have a class in order to use a method, you have to instantiate  a new instance of that class. Sometimes you just want to get some data or access the class and get some information.
+
+```js
+class Human {
+  constructor(height) {
+    this.height = height;
+    this.location = {
+      x: 0,
+      y: 0
+    };
+  }
+    walk(x, y) {
+      this.location.x += x;
+      this.location.y += y;
+  }
+  static sayHello() {
+    return 'Hi There';
+  }
+}
+
+```
+
+We don't have to instantiate a new human object to use the static method.
+
+You can also use the get and set kewyords of objects so instead of calling it, it will always return the result of the function, e.g.:
+```js
+static get sayHello() {
+  return 'Hi There';
+}
+
+console.log(Human.sayHello);
+
+```
+
+```js
+console.log(Human.walk()) //this will give us an error
+```
+
 
 ### Data Management in React
 Data is handled through state, props and context (advanced feauture).
