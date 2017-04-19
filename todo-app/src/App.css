@@ -37,6 +37,6 @@ li{
   list-style-type: none;
 }
 
-.active {
-  text-decoration: line-through;
+.error {
+  color: red;
 }

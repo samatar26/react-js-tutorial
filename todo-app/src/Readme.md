@@ -163,3 +163,74 @@ handleSubmit(e) {
 }
 
 ```
+
+### Prevent empty form values with conditional submit handlers
+Instead of using an if/else statement we can define a function that is invoked when the currentTodo is falsy. We have also put it at above the form as a helpful error message.
+
+
+```js
+handleEmptySubmit(e) {
+  e.preventDefault();
+  this.setState({
+    errorMessage: 'Please supply a todo name!'
+  });
+}
+
+//label
+
+render() {
+  const submitHandler = this.state.currentTodo ? this.handleSubmit : this.handleEmptySubmit;
+  return (
+    <div className="App">
+
+      <div className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <h2>React Todos</h2>
+      </div>
+
+      <div className="Todo-App">
+        {this.state.errorMessage && <span className='error'>{this.state.errorMessage}</span>}
+        <TodoForm currentTodo={this.state.currentTodo}
+          handleInputChange={this.handleInputChange}
+          handleSubmit={submitHandler}/>
+        <TodoList todos={this.state.todos}/>
+      </div>
+
+
+    </div>
+  );
+}
+}
+
+```
+
+### Autobinding
+React.createClass has a built-in magic feature that bounds all methods to 'this' automatically. So instead of doing this:
+
+```js
+class Counter extends React.Component {
+  constructor() {
+    super();
+    this.tick = this.tick.bind(this);
+  }
+  tick() {
+    ...
+  }
+  ...
+}
+```
+
+You can do this:
+```js
+class Counter extends React.Component {
+  state = {
+    todo: [
+      {id: 1, name: 'Sam', isComplete: false},
+    ].
+  }
+  tick = () => {
+    ...
+  }
+  ...
+}
+```

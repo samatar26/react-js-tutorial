@@ -6,30 +6,18 @@ import {TodoForm, TodoList} from './components/todo/index';
 import {addTodo, generateId} from './lib/todoHelpers';
 
 class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      todos: [
-        {id: 1, name: 'Learn JSX', isComplete: false},
-        {id: 2, name: 'Build an Awesome App', isComplete: false},
-        {id: 3, name: 'Help Everyone', isComplete: false},
-      ],
-      currentTodo: '',
+  state = {
+    todos: [
+      {id: 1, name: 'Learn JSX', isComplete: false},
+      {id: 2, name: 'Build an Awesome App', isComplete: false},
+      {id: 3, name: 'Help Everyone', isComplete: false},
+    ],
+    currentTodo: '',
 
-    };
+  };
 
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
 
-  handleInputChange (e) {
-    this.setState({
-      currentTodo: e.target.value
-    });
-
-  }
-
-  handleSubmit(e) {
+  handleSubmit = (e) => {
     e.preventDefault();
     const newId = generateId();
     const newTodo = {id: newId, name: this.state.currentTodo, isComplete: false };
@@ -37,13 +25,29 @@ class App extends Component {
     this.setState({
       todos: updatedTodos,
       currentTodo: '',
+      errorMessage: '',
     });
 
   }
 
+  handleEmptySubmit = (e) => {
+    e.preventDefault();
+    this.setState({
+      errorMessage: 'Please supply a todo name!'
+    });
+  }
+
+
+  handleInputChange = (e) => {
+    this.setState({
+      currentTodo: e.target.value
+    });
+
+  }
 //label
 
   render() {
+    const submitHandler = this.state.currentTodo ? this.handleSubmit : this.handleEmptySubmit;
     return (
       <div className="App">
 
@@ -53,9 +57,10 @@ class App extends Component {
         </div>
 
         <div className="Todo-App">
+          {this.state.errorMessage && <span className='error'>{this.state.errorMessage}</span>}
           <TodoForm currentTodo={this.state.currentTodo}
             handleInputChange={this.handleInputChange}
-            handleSubmit={this.handleSubmit}/>
+            handleSubmit={submitHandler}/>
           <TodoList todos={this.state.todos}/>
         </div>
 
