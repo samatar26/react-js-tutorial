@@ -77,7 +77,7 @@ export const TodoList = (props) => {
 };
 ```
 
-//Validating component input with Prop Types
+### Validating component input with Prop Types
 
 Our todoform components represents a form that we can use to create new todo items. It functions by receiving a prop that is used to set the value of the input and a function and that's how we pass event information, input change events in this case to its parent component.
 
@@ -99,8 +99,67 @@ export const TodoForm = (props) => (
 );
 
 TodoForm.propTypes = {
-  currentTodo: PropTypes.string
+  currentTodo: PropTypes.string.isRequired,
+  handleInputChange: PropTypes.func.isRequired
 };
 
+```
+
+Adding an 'isrequired' means that the property has to be passed into the components to avoid a warning in the console.
+
+### Add data to a list without mutations
+
+With the test below we are making sure that our startTodos and our result is not the same array. When using concat vs push it will add the item to a new array and return it.
+
+We can also use the spread operator and because our tests are passing, we know it doesn't mutate the original array and adds the new item to our list.
+
+```js
+test('addTodo should not mutate the existing todo array', () => {
+  const startTodos = [
+      {id:1, name: 'one', isComplete: false},
+      {id:2, name: 'two', isComplete: false},
+  ];
+
+  const newTodo = {id:3, name: 'three', isComplete: false};
+  const expected = [
+    {id:1, name: 'one', isComplete: false},
+    {id:2, name: 'two', isComplete: false},
+    {id:3, name: 'three', isComplete: false}
+  ];
+
+  const result = addTodo(startTodos, newTodo);
+
+  expect(result).not.toBe(startTodos);
+
+});
+//Helper functions
+export const addTodo = (list, item) => {
+  return list.concat(item);
+};
+
+//Cleaner way
+export const addTodo = (list, item) => [...list, item];
+
+
+
+```
+
+### Update React application state from Form input
+The reason we generate a random id, is because let's say someone deletes a todo in the middle of the list. And you decide to add a todo, based on the length of the todos, you would end up with the same id for that todo as the one before it and keys have to be unique!
+
+```js
+
+handleSubmit(e) {
+  e.preventDefault();
+  const newId = generateId();
+  const newTodo = {id: newId, name: this.state.currentTodo, isComplete: false };
+  const updatedTodos = addTodo(this.state.todos, newTodo);
+  this.setState({
+    todos: updatedTodos,
+    currentTodo: '',
+  });
+  console.dir(e.target.firstChild.value);
+  // addTodo(this.state.todos, );
+}
 
 ```
