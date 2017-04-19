@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+import {TodoForm, TodoList} from './components/todo/index';
+
 class App extends Component {
   constructor() {
     super();
@@ -11,20 +13,22 @@ class App extends Component {
         {id: 2, name: 'Build an Awesome App', isComplete: false},
         {id: 3, name: 'Help Everyone', isComplete: false},
       ],
+      currentTodo: '',
 
     };
+
+    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
-  checkItem(e){
+  handleInputChange (e) {
+    this.setState({
+      currentTodo: e.target.value
+    });
 
-    if (e.target.checked) {
-      this.checked = true;
-      e.target.parentElement.classList.add('active');
-      return;
-    }
-    e.target.parentElement.classList.remove('active');
   }
-  
+
+//label
+
   render() {
     return (
       <div className="App">
@@ -35,17 +39,8 @@ class App extends Component {
         </div>
 
         <div className="Todo-App">
-          <form>
-            <input type="text"/>
-          </form>
-          <div className="Todo-List">
-            <ul>
-              {this.state.todos.map(todo=>
-              <li key={todo.id}>
-                <input type="checkbox" onChange={this.checkItem.bind(this)}/>{todo.name}
-                </li>)}
-            </ul>
-          </div>
+          <TodoForm currentTodo={this.state.currentTodo} handleInputChange={this.handleInputChange}/>
+          <TodoList todos={this.state.todos}/>
         </div>
 
 
