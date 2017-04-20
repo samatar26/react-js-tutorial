@@ -204,7 +204,7 @@ render() {
 
 ```
 
-### Autobinding
+### Autobinding/Property initializers(ES7)
 React.createClass has a built-in magic feature that bounds all methods to 'this' automatically. So instead of doing this:
 
 ```js
@@ -233,4 +233,131 @@ class Counter extends React.Component {
   }
   ...
 }
+```
+
+### Pass data to Event Handlers with Partial Function Application
+We have helper functions defined for finding toDo by ID, toggling the is complete flag of toDo, and taking an updated toDo and replacing a previous version of it in an array. Let's combine these and wire them up to handle marking toDos as complete in our app.
+
+```js
+export const findById = (id, list) => list.find( todo => todo.id===id);
+
+export const toggleTodo = (todo) => ({...todo, isComplete: !todo.isComplete });
+
+export const updateTodo = (list, updated) => {
+  const updatedIndex = list.findIndex(item => item.id === updated.id);
+  return [
+    ...list.slice(0, updatedIndex),
+    updated,
+    ...list.slice(updatedIndex+1)
+  ];
+};
+
+//handleSubmit in app.js using all these helper functions
+handleSubmit = (e) => {
+  e.preventDefault();
+  const newId = generateId();
+  const newTodo = {id: newId, name: this.state.currentTodo, isComplete: false };
+  const updatedTodos = addTodo(this.state.todos, newTodo);
+  this.setState({
+    todos: updatedTodos,
+    currentTodo: '',
+    errorMessage: '',
+  });
+
+}
+
+```
+
+
+We're defining this arrow function inline for this onChange handler because we need to parse some data onto our handler that's not an event object. This is something we'll need to do a lot in React components that deal with collections of data.
+
+```js
+<input type="checkbox" onChange={()=> props.handleToggle(props.id)} checked={props.isComplete}/>{props.name}
+
+```
+
+We can take this one step further getting rid of this error function altogether. Instead using Bind to partially apply this function. I'm going to call PropsSetHandleToggle.bind. My first argument is going to be "null," because I'm not interested in resetting the context.
+
+My second argument will be Props.ID. This means HandleToggle is now equal to a function that already knows what its first argument's value is, which is the ID ToDo for this particular item. Having the ability to partially apply a function through bind is great, but we're going to use this in multiple places. Let's wrap this up in a utility function that cleans this up even more.
+
+The bind() method creates a new function that, when called, has its this keyword set to the provided value, with a given sequence of arguments preceding any provided when the new function is called.
+
+Syntax
+fun.bind(thisArg[, arg1[, arg2[, ...]]])
+[More here](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_objects/Function/bind)
+
+```js
+const handleToggle = props.handleToggle.bind(null,props.id);
+
+      <input type="checkbox" onChange={handleToggle} checked={props.isComplete}/>{props.name}
+```
+
+
+### Create a Pipe Function to Enable Function Composition
+
+Looking at this handle toggle method we can see that find by ID is called and result of that is passed into toggle todo, and then the result of that is passed in as an argument to update todo. The constants todo and toggled are basically only there, so we can pass them along to the next line and then they're never used again.
+
+```js
+handleToggle = (id) => {
+  const todo = findById(id, this.state.todos);
+  const toggled = toggleTodo(todo);
+  const updatedTodos = updateTodo(this.state.todos, toggled);
+  this.setState({todos: updatedTodos});
+}
+
+```
+
+We could do something like this, but this can become unreadable and messy, so we're going to define a pipe utility function. This will allow us to take the results of one function and pass them in to the next function.
+
+```js
+handleToggle = (id) => {
+  const updatedTodos = updateTodo(this.state.todos, toggleTodo(findById(id, this.state.todos)));
+  this.setState({todos: updatedTodos});
+}
+
+```
+
+Here's the way to pipe functions, it's difficult to understand how the reduce method seems to be working:
+
+```js
+const _pipe = (fn1, fn2) => (...args) => fn2(fn1(...args));
+
+export const pipe = (...fns) => fns.reduce(_pipe);
+
+```
+
+### Build a Link Component to Navigate to Routes in React
+history.pushState. PushState takes three arguments, the first is a state object, which we don't need, so we'll pass null. The second represents a page title, we'll just use an empty string for now, and the third is the location we want to add to the browser's history. For this, we're going to use this.props.to. We passed the to location in from Footer.js
+
+
+```js
+export class Link extends Component {
+  handleClick = (evt) => {
+    evt.preventDefault();
+    history.pushState(null, '', this.props.to);
+  }
+  render(){
+    return <a href='#' onClick={this.handleClick}>{this.props.children}</a>;
+  }
+}
+
+Link.propTypes = {
+  to: PropTypes.string.isRequired,
+}
+
+//footer
+import React from 'react';
+
+import {Link} from '../router';
+
+export const Footer = () => {
+  return (
+    <div className='Footer'>
+      <Link to='/'> All</Link>
+      <Link to='/active'>Active</Link>
+      <Link to='/complete'>Complete</Link>
+    </div>
+  );
+};
+
 ```

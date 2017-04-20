@@ -9,7 +9,7 @@
 
 .App-header {
   background-color: #222;
-  height: 150px;
+  height: 50px;
   padding: 20px;
   color: white;
 }
@@ -24,9 +24,12 @@
 }
 
 .Todo-App {
-  padding-top: 2em;
-  display: inline-block;
-  text-align: left;
+  display: flex;
+  flex-direction: column;
+  padding-top: 2rem;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
 }
 
 ul {
@@ -35,8 +38,37 @@ ul {
 
 li{
   list-style-type: none;
+  padding: 1rem;
 }
 
 .error {
   color: red;
+}
+
+li span.delete-item {
+  visibility: hidden;
+}
+
+span.delete-item a{
+  text-decoration: none;
+  color: red;
+  font-weight: bold;
+}
+
+li:hover span.delete-item {
+  visibility: visible;
+}
+
+.Footer a {
+  padding-left:  1rem;
+  padding-right: 1rem;
+}
+
+
+.Footer a.active {
+  font-weight: bold;
+}
+
+.activeClass {
+  text-decoration: line-through;
 }
